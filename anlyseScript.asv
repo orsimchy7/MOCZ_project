@@ -1,0 +1,13 @@
+% folderPath = 'C:\Users\Talkid\Desktop\MOCZ_Pool\TX_signals\fiveVmax\MOCZ_packets\L_changes';
+% files = dir(folderPath);
+% M = length(files) / 5 - 2; % assumes try = 5;
+L = zeros(length(files) / 5 ,1);
+for k = 1 : length(files) / 5
+   for j = 1: 5
+basefileName = files(k).name;
+fullfileName = fullfile(folderPath, basefileName);
+fprintf('now: %s\n', basefileName);
+load(fullfileName);
+   end
+
+end

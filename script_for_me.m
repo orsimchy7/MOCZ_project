@@ -1,0 +1,1 @@
+timeNumeric = seconds(recordedData.Time);

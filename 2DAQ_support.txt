@@ -1,0 +1,73 @@
+% =========================================================
+        % HARDWARE TRANSMISSION (Dual vs Single DAQ Support)
+        % =========================================================
+        devList = daqlist;
+        
+        % Check the GUI switch for Dual DAQ mode
+        if app.UseDualDAQSetupCheckBox.Value == true
+            % --- DUAL DAQ MODE ---
+            app.ProgressTextArea.Value = 'Configuring Dual DAQs...';
+            drawnow;
+            
+            % Assign Device IDs (Change indices if your TX is Dev2 and RX is Dev1)
+            devTx = devList.DeviceID(1); 
+            devRx = devList.DeviceID(2); 
+            
+            % Setup Transmitter
+            d_tx = daq("ni");
+            addoutput(d_tx, devTx, "ao0", "Voltage");
+            d_tx.Rate = imageParams.Fs;
+            
+            % Setup Receiver
+            d_rx = daq("ni");
+            addinput(d_rx, devRx, "ai0", "Voltage");
+            d_rx.Rate = imageParams.Fs;
+            
+            % Zero padding for ISI capture
+            listenTime = 0.5;
+            numZeros = round(listenTime * d_tx.Rate);
+            paddedSignal = [txSignal(:); zeros(numZeros, 1)];
+            
+            % Calculate total listen duration (Signal length + buffer)
+            totalCaptureTime = (length(paddedSignal) / d_rx.Rate) + 1.0; 
+            
+            app.ProgressTextArea.Value = 'Transmitting and recording (Dual Mode)...';
+            drawnow;
+            
+            % 1. Start the RX box listening in the background
+            start(d_rx, "Duration", seconds(totalCaptureTime));
+            
+            % 2. Instantly fire the TX box (This blocks until finished)
+            write(d_tx, paddedSignal);
+            
+            % 3. Fetch the recorded data buffer from the RX box
+            recordedData = read(d_rx, "all");
+            
+        else
+            % --- SINGLE DAQ MODE (Original) ---
+            app.ProgressTextArea.Value = 'Configuring Single DAQ...';
+            drawnow;
+            
+            d = daq("ni");
+            devID = devList.DeviceID(1);
+            
+            addinput(d, devID, "ai0", "Voltage");
+            addoutput(d, devID, "ao0", "Voltage");
+            d.Rate = imageParams.Fs;
+            
+            % Zero padding
+            listenTime = 0.5;
+            numZeros = round(listenTime * d.Rate);
+            paddedSignal = [txSignal(:); zeros(numZeros, 1)];
+            
+            app.ProgressTextArea.Value = 'Transmitting and recording (Single Mode)...';
+            drawnow;
+            
+            % Transmit and record simultaneously
+            recordedData = readwrite(d, paddedSignal);
+        end
+        
+        app.ProgressTextArea.Value = 'Data received! Saving raw recording...';
+        drawnow;
+        
+        % ... [The rest of your saving and decoding logic remains exactly the same!] ...

@@ -130,7 +130,7 @@ end
 [signal_pb_total, ~, group_delay] = pulseSHP(symbols_total, simParams, 'modulate');
 % no pulse shaping:
 %signal_pb_total = symbols_total;
-group_delay = 1;
+%group_delay = 1; %Uncommemt if we remove reised cosine filter
 M_sig = max(signal_pb_total, [], "all");
 m_sig = min(signal_pb_total, [], "all");
 a = simParams.a;

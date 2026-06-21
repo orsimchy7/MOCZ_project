@@ -1,0 +1,93 @@
+function [simParams] = makeParams()
+%UNTITLED3 Summary of this function goes here
+%   Detailed explanation goes here
+
+
+% -- Params --
+
+% MOCZ and packet configuration
+a = -10; %min voltage amplitude [V]
+b = 10;% to[ voltage amplitude [V]
+image_coding = 0; % choose 1 if you want to transmit a photo
+image_file = ""; % add image path if photo is transmitted
+B = 20; %num of sequences in a message. =200
+L = 5; %5; % additional taps that the channel conv adds
+K = 6 ; %X(z) polynomial order. there are K+1 coefficents
+lambda = 1;
+Kidxs = 0:K-1;
+R = sqrt(1+2*lambda*sin(pi/K));
+%%%%%%%% test:
+R = 1.2;
+%%%%%%%%
+theta_c = ((2*pi) * (Kidxs / K))';
+P = [];
+power = []; %will be defined in generate_TX_signal_pool. precentages.
+testSNR = [];
+
+
+% zadOffChu (sync):
+N = 63;     % Sequence length
+u = 2;     % Root index (gcd(u,N)=1)
+zadoffChuPair = [u, N];
+
+% 3. Greedy decoder
+N = K + L ;   % Convolution length
+zeros_bank = zeros(1,2*K); %2K optional zeros of polynom
+zeros_bank(1,1:K) = R*exp(1i * theta_c(1:K)); %ONES
+zeros_bank(1,(K+1):2*K) = (1/R)*exp(1i * theta_c(1:K)); %ZEROS
+V_bank = zeros(N, 2*K); %all Vj vectors
+for col = 1:2*K
+    V_bank(:, col) = conj(zeros_bank(col)).^(0:N-1);
+end
+
+% 4. ML decoder
+% Precompute all 2^K binary combinations and their corresponding zero vectors
+combinations = dec2bin(0:2^K-1) - '0';   %matrix of all 2^k possible messages
+V_all = zeros(N,K,2^K); %all possible vandermonde matrixes
+
+alpha_candidates = zeros(2^K, K); %all possible alphas - mapping
+for idx = 1:2^K
+    for k = 1:K
+        if combinations(idx, k) == 1
+            alpha_candidates(idx, k) = R * exp(1i * theta_c(k));
+        else
+            alpha_candidates(idx, k) = (1/R) * exp(1i * theta_c(k));
+        end
+    end
+    
+    alpha = alpha_candidates(idx, :);
+    V = zeros(N, K);
+    for col = 1:K
+        V(:, col) = conj(alpha(col)).^(0:N-1);
+    end
+
+    V_all(:,:,idx) = V;
+
+    C = V' * V;
+    [U, S_diag, ~] = svd(C);
+    Cinv_all(:,:,idx) = U * diag(1 ./ sqrt(diag(S_diag))) * U';
+    % Cinv_all(:,:,idx) = inv(sqrtm(C));
+end
+
+% 5. general
+usedIdx = false(2^K,1);
+figFlag = 0;
+
+Tsym = 1e-3;
+fc = 25e3;
+Fs = 200e3;
+betha = 1;
+% BW = 1 / Tsym; 
+% BWn = (1+betha)*BW;
+
+
+simParams = struct('B', B, 'K', K, 'Tsym', Tsym, 'fc', fc, 'Fs', Fs, ...
+    'lambda', lambda, 'L', L, 'figFlag', figFlag, 'betha', betha, ...
+    'zadoffChuPair', zadoffChuPair, ...
+    'N', N, 'V_bank', V_bank,  ...
+    'combinations', combinations,'Cinv_all',Cinv_all,'V_all',V_all, ...
+    'R', R, 'theta_c', theta_c, ...
+    'usedIdx', usedIdx, 'image_coding', image_coding, ...
+    'image_file', image_file, 'a', a, 'b', b, 'P', P, 'power', power, 'testSNR', testSNR);
+
+end

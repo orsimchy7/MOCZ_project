@@ -1,6 +1,5 @@
 function [bits_rx_ML, W_mat] = ML(x_vec_decoded,simParams)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+
 
 
     K = simParams.K;

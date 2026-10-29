@@ -16,7 +16,7 @@
 % than others.
 %
 % TODO: point this at wherever your SNR_changes recordings actually live.
-folderPath = '\\wildwest\ecad\Matlab\projects\MOCZ_project_technion_orshoham\___all updated folders___\mocz_FilesFromPoolComputer\MOCZ_pool\NEW_Recordings_Pool_28_06\fiveVmax\Difficult_channel\MOCZ_packets\SNR_changes';
+folderPath = '\\Recordings\fiveVmax\Difficult_channel\MOCZ_packets\SNR_changes';
 files = dir(fullfile(folderPath, '*.mat'));
 
 numDecoders  = 2; % 1 = DiZeT, 2 = ML

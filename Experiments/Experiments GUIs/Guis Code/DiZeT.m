@@ -1,5 +1,4 @@
 function [message_rec] = DiZeT(R, theta_c, y, K)
-    %UNTITLED2 Summary of this function goes here
     %   x_rec are reconstructed polinom coefficients of x
     % UPDATE: convert y so dizet will be symetric to ML (decode from the
     % same symbols number) + treat edge case of conv with 0 coeff:

@@ -1,6 +1,5 @@
 function [bits_rx_greedy] = Greedy(x_vec_decoded,simParams)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
+
 
     K = simParams.K;
     R = simParams.R;

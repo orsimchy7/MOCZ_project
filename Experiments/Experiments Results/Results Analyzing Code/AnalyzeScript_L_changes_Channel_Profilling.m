@@ -1,5 +1,5 @@
 %% running L_changes
-folderPath = '\\wildwest\ecad\Matlab\projects\MOCZ_project_technion_orshoham\___all updated folders___\mocz_FilesFromPoolComputer\MOCZ_pool\NEW_Recordings_Pool_28_06\fiveVmax\MOCZ_packets\L_changes';
+folderPath = '\\Recordings\fiveVmax\MOCZ_packets\L_changes';
 files = dir(fullfile(folderPath, '*.mat'));
 
 numRuns      = 5;

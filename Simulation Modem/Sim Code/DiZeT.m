@@ -1,5 +1,4 @@
 function [message_rec] = DiZeT(R, theta_c, y, K)
-    %UNTITLED2 Summary of this function goes here
     %   x_rec are reconstructed polinom coefficients of x
     Lt = length(y);
     message_rec = zeros(K,1);

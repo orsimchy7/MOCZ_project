@@ -9,8 +9,8 @@ clear all; close all; clc;
 
 %% Setup Base Parameters and Directories
 baseParams = makeParams(); % Load baseline parameters
-baseParams.a = -5 ;
-baseParams.b = 5 ;
+baseParams.a = -10;
+baseParams.b = 10 ;
 
 num_signals_per_type = 5;  % Set how many signals to generate per variation
 
